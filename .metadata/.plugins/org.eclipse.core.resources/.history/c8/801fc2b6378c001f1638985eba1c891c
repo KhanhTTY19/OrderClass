@@ -1,0 +1,131 @@
+package person3;
+import person1.*;
+import java.util.*;
+
+
+public class Order {
+	private Map<String, Integer> productList = new HashMap<String, Integer>();
+	private String id = new String();
+	private long profit;
+	private long totalSellingPrice = 0;
+	private long totalPurchasePrice = 0;
+	
+	public Order(String id) {
+		this.id = id;
+	}
+	
+	public Order(String id, Map<String, Integer> productList) {
+		this.id = id;
+		this.productList = productList;
+	}
+	
+	public String getID() {
+		return this.id;
+	}
+	
+	public long getProfit() {
+		return this.profit;
+	}
+	
+	public Map<String, Integer> getProductList() {
+		return this.productList;
+	}
+	
+	public long getSellingPrice() {
+		return this.totalSellingPrice;
+	}
+	
+	public long getPurchasePrice() {
+		return this.totalPurchasePrice;
+	}
+	
+	private void updateID(String id) {
+		this.id = id;
+	}
+	
+	private void updateSellingPrice(long p) {
+		this.totalSellingPrice = p;
+	}
+	
+	private void updatePurchasePrice(long p) {
+		this.totalPurchasePrice = p;
+	}
+	
+	private void addToCart(String proID, int quantty) {
+		Product item = new Product(proID);
+		if (this.productList.get(proID) != null) this.productList.put(proID, productList.get(proID) + quantty);
+		else this.productList.put(proID, quantty);
+		this.totalSellingPrice += item.getSellingPrice() * quantty;
+		this.totalPurchasePrice += item.getPurchasePrice() *quantty;
+	}
+	
+	private void removeFromCart(String proID) {
+		int quantty = this.productList.get(proID);
+		this.addToCart(proID, -quantty);
+		this.productList.remove(proID);
+	}
+	
+	private void reduceQuanttyFromCart(String proID, int quantty) {
+		if (quantty < this.productList.get(proID))
+		this.addToCart(proID, -quantty);
+		else {
+			this.productList.remove(proID);
+		}
+	}
+	
+	private void writeToCSV() {
+		
+	}
+	
+	public void getOrder() {
+		long totalSellingPrice = 0;
+		long totalPurchasePrice = 0;
+		Scanner inp = new Scanner(System.in);
+		String itemID = new String();
+		int quantty;
+		Map<String, Integer> prodList = new HashMap<String, Integer>();
+		
+		// Add item to cart by itemID
+		while(true) {
+			/*
+			 * 1. add to cart
+			 * 2. remove from card
+			 * 3. reduce quantity
+			 * 4. end of add to cart
+			 * */
+			int function = inp.nextInt();
+			if (function == 1) {
+				itemID = inp.nextLine();
+				quantty = inp.nextInt();
+				this.addToCart(itemID, quantty);
+			}
+			else if(function == 2) {
+				itemID = inp.nextLine();
+				this.removeFromCart(itemID);
+			}
+			else if (function == 3) {
+				
+			}
+		} 
+		/*End of adding item to cart but I also want to add function to remove them from cart*/
+		
+		/*Call the paymentProcess is here*/
+		Payment payMent = new Payment(totalSellingPrice);
+		if (payMent.processPayment()) {
+			/*Update orderID as paymentID*/							// Contact Hoang
+			
+			this.updateID(payMent.getID());
+			this.updatePurchasePrice(totalPurchasePrice);
+			this.updateSellingPrice(totalSellingPrice);
+			
+			//Reduce quantity of item in product.csv after getorder ---is this part belong to Son?---
+			for (Map.Entry<String, Integer> i : prodList.entrySet()) {
+				Product item = new Product(i.getKey());
+				
+				item.updateQuantity(-i.getValue()); 				// Contact Nguyet Anh 
+			}
+			
+			//Save the data to order.csv
+		}
+	}
+}
